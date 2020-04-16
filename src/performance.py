@@ -2,13 +2,26 @@ import pandas as pd
 import numpy as np
 
 output_dir = './../output/'
+#geometry
+order = ['area',#ok
+         'volume',#ok
+         'area_volume_ratio',#ok
+         'edge_ratio',#ok
+         'radius_ratio',#ok
+         'aspect_ratio',#ok
+         'max_solid_angle',
+         'min_solid_angle',
+         'solid_angle']
+
+# Dirichlet Distribution alphas
+alphas = np.arange(1,10,0.5)
 
 class Performance:
 	
 	def __init__(self):
 		pass
 	
-	def average_results(self, rfile, kind):
+	def average_results(self, rfile, kind,version):
 		'''
 		Calculates average results
 		:param rfile: filename with results
@@ -51,6 +64,25 @@ class Performance:
 			print(i)
 		
 		if kind == 'biclass':
-			dfr.to_csv(output_dir + 'average_results_biclass.csv', index=False)
+			dfr.to_csv(output_dir + 'average_results_biclass_'+str(version)+'.csv', index=False)
 		else:
-			dfr.to_csv(output_dir + 'average_results_multiclass.csv', index=False)
+			dfr.to_csv(output_dir + 'average_results_multiclass_'+str(version)+'.csv', index=False)
+			
+			
+	def verfify_alpha_performance(self,filename):
+		
+		df = pd.read_csv(filename)
+		df_B1 = df[df['PREPROC']=='_Borderline1'].copy()
+		df_B2 = df[df['PREPROC'] == '_Borderline2'].copy()
+		df_GEO = df[df['PREPROC'] == '_Geometric_SMOTE'].copy()
+		df_SMOTE = df[df['PREPROC'] == '_SMOTE'].copy()
+		df_SMOTEsvm = df[df['PREPROC'] == '_smoteSVM'].copy()
+		df_original = df[df['PREPROC'] == '_train'].copy()
+		
+		for o in order:
+			for a in alphas:
+				GEOMETRY = '_delaunay_'+ o + '_'+str(a)
+				df_dto = df_best_dto[df_best_dto['PREPROC'] == GEOMETRY].copy()
+				df = pd.concat([df_B1,df_B2,df_GEO,df_SMOTE,df_SMOTEsvm,df_original,df_dto])
+				diag.rank_by_algorithm(df, 'multiclasse', './../output_dir/multiclass/', 'pca', o, str(a))
+				diag.rank_dto_by(o + '_'+ str(a))
