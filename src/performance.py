@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from classifiers import classifiers_list
 from datasets import dataset_biclass, dataset_multiclass
 
 output_dir = './../output/'
@@ -96,7 +97,7 @@ class Performance:
 		for name, group in df_temp:
 			group = group.reset_index()
 			group.drop('index', axis=1, inplace=True)
-			df.to_csv(rank_dir + '_' + kind + '_' + order + '_' + str(alpha) + '.csv')
+			df.to_csv(rank_dir + '_' + kind + '_' + order + '_' + str(alpha) + '.csv', index=False)
 			
 			j = 0
 			if kind == 'biclass':
@@ -286,32 +287,20 @@ class Performance:
 			
 			# Grava arquivos importantes
 			df_pre.to_csv(
-					rank_dir + '_total_rank_' + kind + '_' + order + '_' + str(
-							alpha) + '_' + name + '_pre.csv',
-					index=False)
+					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_pre.csv', index=False)
 			df_rec.to_csv(
-					rank_dir + '_total_rank_' + kind + '_' + order + '_' + str(
-							alpha) + '_' + name + '_rec.csv',
-					index=False)
+					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_rec.csv', index=False)
 			df_spe.to_csv(
-					rank_dir + '_total_rank_' + kind + '_' + order + '_' + str(
-							alpha) + '_' + name + '_spe.csv',
-					index=False)
-			df_f1.to_csv(rank_dir + '_total_rank_' + kind + '_' + order + '_' + str(
-					alpha) + '_' + name + '_f1.csv',
-			             index=False)
+					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_spe.csv', index=False)
+			df_f1.to_csv(
+					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_f1.csv', index=False)
 			df_geo.to_csv(
-					rank_dir + '_total_rank_' + kind + '_' + order + '_' + str(
-							alpha) + '_' + name + '_geo.csv',
-					index=False)
+					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_geo.csv', index=False)
 			df_iba.to_csv(
-					rank_dir + '_total_rank_' + kind + '_' + order + '_' + str(
-							alpha) + '_' + name + '_iba.csv',
-					index=False)
+					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_iba.csv', index=False)
 			if kind == 'biclass':
 				df_auc.to_csv(
-						rank_dir + '_total_rank_' + kind + '_' + order + '_' + str(
-								alpha) + '_' + name + '_auc.csv',
+						rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_auc.csv',
 						index=False)
 			
 			media_pre_rank_file.to_csv(
@@ -401,18 +390,77 @@ class Performance:
 			print('Delaunay Type= ', delaunay_type)
 			print('Algorithm= ', name)
 	
+	def rank_dto_by(self, geometry, kind):
+		if kind == 'biclass':
+			M = ['_pre.csv', '_rec.csv', '_spe.csv', '_f1.csv', '_geo.csv', '_iba.csv', '_auc.csv']
+		else:
+			M = ['_pre.csv', '_rec.csv', '_spe.csv', '_f1.csv', '_geo.csv', '_iba.csv']
+		
+		df_media_rank = pd.DataFrame(columns=['ALGORITHM', 'RANK_ORIGINAL', 'RANK_SMOTE',
+		                                      'RANK_SMOTE_SVM', 'RANK_BORDERLINE1', 'RANK_BORDERLINE2',
+		                                      'RANK_GEOMETRIC_SMOTE', 'RANK_DELAUNAY', 'unit'])
+		
+		name = rank_dir + kind + '_total_rank_' + geometry + '_'
+		
+		for m in M:
+			i = 0
+			for c in classifiers_list:
+				df = pd.read_csv(name + c + m)
+				rank_original = df.RANK_ORIGINAL.mean()
+				rank_smote = df.RANK_SMOTE.mean()
+				rank_smote_svm = df.RANK_SMOTE_SVM.mean()
+				rank_b1 = df.RANK_BORDERLINE1.mean()
+				rank_b2 = df.RANK_BORDERLINE2.mean()
+				rank_geo_smote = df.RANK_GEOMETRIC_SMOTE.mean()
+				rank_dto = df.RANK_DELAUNAY.mean()
+				df_media_rank.loc[i, 'ALGORITHM'] = df.loc[0, 'ALGORITHM']
+				df_media_rank.loc[i, 'RANK_ORIGINAL'] = rank_original
+				df_media_rank.loc[i, 'RANK_SMOTE'] = rank_smote
+				df_media_rank.loc[i, 'RANK_SMOTE_SVM'] = rank_smote_svm
+				df_media_rank.loc[i, 'RANK_BORDERLINE1'] = rank_b1
+				df_media_rank.loc[i, 'RANK_BORDERLINE2'] = rank_b2
+				df_media_rank.loc[i, 'RANK_GEOMETRIC_SMOTE'] = rank_geo_smote
+				df_media_rank.loc[i, 'RANK_DELAUNAY'] = rank_dto
+				df_media_rank.loc[i, 'unit'] = df.loc[0, 'unit']
+				i += 1
+			
+			dfmediarank = df_media_rank.copy()
+			dfmediarank = dfmediarank.sort_values('RANK_DELAUNAY')
+			
+			dfmediarank.loc[i, 'ALGORITHM'] = 'avarage'
+			dfmediarank.loc[i, 'RANK_ORIGINAL'] = df_media_rank['RANK_ORIGINAL'].mean()
+			dfmediarank.loc[i, 'RANK_SMOTE'] = df_media_rank['RANK_SMOTE'].mean()
+			dfmediarank.loc[i, 'RANK_SMOTE_SVM'] = df_media_rank['RANK_SMOTE_SVM'].mean()
+			dfmediarank.loc[i, 'RANK_BORDERLINE1'] = df_media_rank['RANK_BORDERLINE1'].mean()
+			dfmediarank.loc[i, 'RANK_BORDERLINE2'] = df_media_rank['RANK_BORDERLINE2'].mean()
+			dfmediarank.loc[i, 'RANK_GEOMETRIC_SMOTE'] = df_media_rank['RANK_GEOMETRIC_SMOTE'].mean()
+			dfmediarank.loc[i, 'RANK_DELAUNAY'] = df_media_rank['RANK_DELAUNAY'].mean()
+			dfmediarank.loc[i, 'unit'] = df.loc[0, 'unit']
+			i += 1
+			dfmediarank.loc[i, 'ALGORITHM'] = 'std'
+			dfmediarank.loc[i, 'RANK_ORIGINAL'] = df_media_rank['RANK_ORIGINAL'].std()
+			dfmediarank.loc[i, 'RANK_SMOTE'] = df_media_rank['RANK_SMOTE'].std()
+			dfmediarank.loc[i, 'RANK_SMOTE_SVM'] = df_media_rank['RANK_SMOTE_SVM'].std()
+			dfmediarank.loc[i, 'RANK_BORDERLINE1'] = df_media_rank['RANK_BORDERLINE1'].std()
+			dfmediarank.loc[i, 'RANK_BORDERLINE2'] = df_media_rank['RANK_BORDERLINE2'].std()
+			dfmediarank.loc[i, 'RANK_GEOMETRIC_SMOTE'] = df_media_rank['RANK_GEOMETRIC_SMOTE'].std()
+			dfmediarank.loc[i, 'RANK_DELAUNAY'] = df_media_rank['RANK_DELAUNAY'].std()
+			dfmediarank.loc[i, 'unit'] = df.loc[0, 'unit']
+			dfmediarank.to_csv(output_dir + kind + '_results_media_rank_' + geometry + m, index=False)
+	
 	def run_rank(self, filename, kind):
-		df = pd.read_csv(filename)
-		df_B1 = df[df['PREPROC'] == '_Borderline1'].copy()
-		df_B2 = df[df['PREPROC'] == '_Borderline2'].copy()
-		df_GEO = df[df['PREPROC'] == '_Geometric_SMOTE'].copy()
-		df_SMOTE = df[df['PREPROC'] == '_SMOTE'].copy()
-		df_SMOTESVM = df[df['PREPROC'] == '_smoteSVM'].copy()
-		df_original = df[df['PREPROC'] == '_train'].copy()
+		df_best_dto = pd.read_csv(filename)
+		df_B1 = df_best_dto[df_best_dto['PREPROC'] == '_Borderline1'].copy()
+		df_B2 = df_best_dto[df_best_dto['PREPROC'] == '_Borderline2'].copy()
+		df_GEO = df_best_dto[df_best_dto['PREPROC'] == '_Geometric_SMOTE'].copy()
+		df_SMOTE = df_best_dto[df_best_dto['PREPROC'] == '_SMOTE'].copy()
+		df_SMOTEsvm = df_best_dto[df_best_dto['PREPROC'] == '_smoteSVM'].copy()
+		df_original = df_best_dto[df_best_dto['PREPROC'] == '_train'].copy()
 		
 		for o in order:
 			for a in alphas:
 				GEOMETRY = '_delaunay_' + o + '_' + str(a)
-				df_dto = df[df['PREPROC'] == GEOMETRY].copy()
-				df = pd.concat([df_B1, df_B2, df_GEO, df_SMOTE, df_SMOTESVM, df_original, df_dto])
+				df_dto = df_best_dto[df_best_dto['PREPROC'] == GEOMETRY].copy()
+				df = pd.concat([df_B1, df_B2, df_GEO, df_SMOTE, df_SMOTEsvm, df_original, df_dto])
 				self.rank_by_algorithm(df, kind, o, str(a))
+				self.rank_dto_by(o + '_' + str(a), kind)
