@@ -2,12 +2,11 @@ import Orange
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
+from parameters import output_dir, rank_dir, input_dir
 from classifiers import classifiers_list
 from datasets import dataset_biclass, dataset_multiclass
 
-output_dir = './../output/'
-rank_dir = './../rank/'
+
 # geometry
 order = ['area',  # ok
          'volume',  # ok
@@ -28,7 +27,7 @@ class Performance:
 	def __init__(self):
 		pass
 	
-	def average_results(self, rfile, kind, version):
+	def average_results(self, rfile, kind, release):
 		'''
 		Calculates average results
 		:param rfile: filename with results
@@ -53,7 +52,6 @@ class Performance:
 		for name, group in df_temp:
 			group = group.reset_index()
 			dfr.at[i, 'MODE'] = group.loc[0, 'MODE']
-			mode = group.loc[0, 'MODE']
 			dfr.at[i, 'DATASET'] = group.loc[0, 'DATASET']
 			dfr.at[i, 'PREPROC'] = group.loc[0, 'PREPROC']
 			dfr.at[i, 'ALGORITHM'] = group.loc[0, 'ALGORITHM']
@@ -68,14 +66,12 @@ class Performance:
 			if kind == 'biclass':
 				dfr.at[i, 'AUC'] = group['AUC'].mean()
 			i = i + 1
-			print(i)
 		
-		if kind == 'biclass':
-			dfr.to_csv(output_dir + 'average_results_biclass_' + str(version) + '.csv', index=False)
-		else:
-			dfr.to_csv(output_dir + 'average_results_multiclass_' + str(version) + '.csv', index=False)
+		print('Total lines in a file: ',i)
+		dfr.to_csv(input_dir + 'average_results_'+kind+'_' + str(release) + '.csv', index=False)
+		
 	
-	def rank_by_algorithm(self, df, kind, order, alpha):
+	def rank_by_algorithm(self, df, kind, order, alpha,release):
 		'''
 		Calcula rank
 		:param df:
@@ -97,7 +93,7 @@ class Performance:
 		for name, group in df_temp:
 			group = group.reset_index()
 			group.drop('index', axis=1, inplace=True)
-			df.to_csv(rank_dir + '_' + kind + '_' + order + '_' + str(alpha) + '.csv', index=False)
+			df.to_csv(rank_dir + release+'_' + kind + '_' + order + '_' + str(alpha) + '.csv', index=False)
 			
 			j = 0
 			if kind == 'biclass':
@@ -287,49 +283,48 @@ class Performance:
 			
 			# Grava arquivos importantes
 			df_pre.to_csv(
-					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_pre.csv', index=False)
+					rank_dir+ release+'_'+ kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_pre.csv', index=False)
 			df_rec.to_csv(
-					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_rec.csv', index=False)
+					rank_dir+ release+'_'+ kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_rec.csv', index=False)
 			df_spe.to_csv(
-					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_spe.csv', index=False)
+					rank_dir+ release+'_'+ kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_spe.csv', index=False)
 			df_f1.to_csv(
-					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_f1.csv', index=False)
+					rank_dir+ release+'_'+ kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_f1.csv', index=False)
 			df_geo.to_csv(
-					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_geo.csv', index=False)
+					rank_dir+ release+'_'+ kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_geo.csv', index=False)
 			df_iba.to_csv(
-					rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_iba.csv', index=False)
+					rank_dir+ release+'_'+ kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_iba.csv', index=False)
 			if kind == 'biclass':
 				df_auc.to_csv(
-						rank_dir + kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_auc.csv',
+						rank_dir+ release+'_'+ kind + '_total_rank_' + order + '_' + str(alpha) + '_' + name + '_auc.csv',
 						index=False)
 			
 			media_pre_rank_file.to_csv(
-					rank_dir + '_media_rank_' + kind + '_' + order + '_' + str(
-							alpha) + '_' + name + '_pre.csv',
+					rank_dir+ release+'_'+ 'media_rank_' + kind + '_' + order + '_' + str(alpha) + '_' + name + '_pre.csv',
 					index=False)
 			media_rec_rank_file.to_csv(
-					rank_dir + '_media_rank_' + kind + '_' + order + '_' + str(
+					rank_dir +release+ '_media_rank_' + kind + '_' + order + '_' + str(
 							alpha) + '_' + name + '_rec.csv',
 					index=False)
 			media_spe_rank_file.to_csv(
-					rank_dir + '_media_rank_' + kind + '_' + order + '_' + str(
+					rank_dir +release + '_media_rank_' + kind + '_' + order + '_' + str(
 							alpha) + '_' + name + '_spe.csv',
 					index=False)
 			media_f1_rank_file.to_csv(
-					rank_dir + '_media_rank_' + kind + '_' + order + '_' + str(
+					rank_dir  +release+ '_media_rank_' + kind + '_' + order + '_' + str(
 							alpha) + '_' + name + '_f1.csv',
 					index=False)
 			media_geo_rank_file.to_csv(
-					rank_dir + '_media_rank_' + kind + '_' + order + '_' + str(
+					rank_dir  +release+ '_media_rank_' + kind + '_' + order + '_' + str(
 							alpha) + '_' + name + '_geo.csv',
 					index=False)
 			media_iba_rank_file.to_csv(
-					rank_dir + '_media_rank_' + kind + '_' + order + '_' + str(
+					rank_dir  +release+ '_media_rank_' + kind + '_' + order + '_' + str(
 							alpha) + '_' + name + '_iba.csv',
 					index=False)
 			if kind == 'biclass':
 				media_auc_rank_file.to_csv(
-						rank_dir + '_media_rank_' + kind + '_' + order + '_' + str(
+						rank_dir  +release+ '_media_rank_' + kind + '_' + order + '_' + str(
 								alpha) + '_' + name + '_auc.csv',
 						index=False)
 			
@@ -342,41 +337,41 @@ class Performance:
 			cd = Orange.evaluation.compute_CD(avranks, len(dataset))
 			Orange.evaluation.graph_ranks(avranks, identificadores, cd=cd, width=9, textspace=3)
 			plt.savefig(
-					rank_dir + 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_pre.pdf')
+					rank_dir +release + 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_pre.pdf')
 			plt.close()
 			
 			avranks = list(media_rec_rank)
 			cd = Orange.evaluation.compute_CD(avranks, len(dataset))
 			Orange.evaluation.graph_ranks(avranks, identificadores, cd=cd, width=9, textspace=3)
 			plt.savefig(
-					rank_dir + 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_rec.pdf')
+					rank_dir  +release+ 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_rec.pdf')
 			plt.close()
 			
 			avranks = list(media_spe_rank)
 			cd = Orange.evaluation.compute_CD(avranks, len(dataset))
 			Orange.evaluation.graph_ranks(avranks, identificadores, cd=cd, width=9, textspace=3)
 			plt.savefig(
-					rank_dir + 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_spe.pdf')
+					rank_dir  +release+ 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_spe.pdf')
 			plt.close()
 			
 			avranks = list(media_f1_rank)
 			cd = Orange.evaluation.compute_CD(avranks, len(dataset))
 			Orange.evaluation.graph_ranks(avranks, identificadores, cd=cd, width=9, textspace=3)
-			plt.savefig(rank_dir + 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_f1.pdf')
+			plt.savefig(rank_dir  +release+ 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_f1.pdf')
 			plt.close()
 			
 			avranks = list(media_geo_rank)
 			cd = Orange.evaluation.compute_CD(avranks, len(dataset))
 			Orange.evaluation.graph_ranks(avranks, identificadores, cd=cd, width=9, textspace=3)
 			plt.savefig(
-					rank_dir + 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_geo.pdf')
+					rank_dir  +release+ 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_geo.pdf')
 			plt.close()
 			
 			avranks = list(media_iba_rank)
 			cd = Orange.evaluation.compute_CD(avranks, len(dataset))
 			Orange.evaluation.graph_ranks(avranks, identificadores, cd=cd, width=9, textspace=3)
 			plt.savefig(
-					rank_dir + 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_iba.pdf')
+					rank_dir  +release+ 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_iba.pdf')
 			plt.close()
 			
 			if kind == 'biclass':
@@ -384,13 +379,13 @@ class Performance:
 				cd = Orange.evaluation.compute_CD(avranks, len(dataset))
 				Orange.evaluation.graph_ranks(avranks, identificadores, cd=cd, width=9, textspace=3)
 				plt.savefig(
-						rank_dir + 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_auc.pdf')
+						rank_dir  +release+ 'cd_' + '_' + kind + '_' + delaunay_type + '_' + name + '_auc.pdf')
 				plt.close()
 			
 			print('Delaunay Type= ', delaunay_type)
 			print('Algorithm= ', name)
 	
-	def rank_dto_by(self, geometry, kind):
+	def rank_dto_by(self, geometry, kind,release):
 		if kind == 'biclass':
 			M = ['_pre.csv', '_rec.csv', '_spe.csv', '_f1.csv', '_geo.csv', '_iba.csv', '_auc.csv']
 		else:
@@ -400,8 +395,7 @@ class Performance:
 		                                      'RANK_SMOTE_SVM', 'RANK_BORDERLINE1', 'RANK_BORDERLINE2',
 		                                      'RANK_GEOMETRIC_SMOTE', 'RANK_DELAUNAY', 'unit'])
 		
-		name = rank_dir + kind + '_total_rank_' + geometry + '_'
-		
+		name = rank_dir + release + '_' + kind + '_total_rank_'+ geometry + '_'
 		for m in M:
 			i = 0
 			for c in classifiers_list:
@@ -446,9 +440,179 @@ class Performance:
 			dfmediarank.loc[i, 'RANK_GEOMETRIC_SMOTE'] = df_media_rank['RANK_GEOMETRIC_SMOTE'].std()
 			dfmediarank.loc[i, 'RANK_DELAUNAY'] = df_media_rank['RANK_DELAUNAY'].std()
 			dfmediarank.loc[i, 'unit'] = df.loc[0, 'unit']
-			dfmediarank.to_csv(output_dir + kind + '_results_media_rank_' + geometry + m, index=False)
+			dfmediarank.to_csv(output_dir + release + '_' + kind + '_results_media_rank_' + geometry + m, index=False)
 	
-	def run_rank(self, filename, kind):
+	def grafico_variacao_alpha(self, kind,release):
+		if kind == 'biclass':
+			M = ['_geo', '_iba', '_auc']
+		else:
+			M = ['_geo', '_iba']
+		
+		order = ['area', 'volume', 'area_volume_ratio', 'edge_ratio', 'radius_ratio', 'aspect_ratio', 'max_solid_angle',
+		         'min_solid_angle', 'solid_angle']
+		
+		# Dirichlet Distribution alphas
+		alphas = np.arange(1, 10, 0.5)
+		
+		df_alpha_variations_rank = pd.DataFrame()
+		df_alpha_variations_rank['alphas'] = alphas
+		df_alpha_variations_rank.index = alphas
+		
+		df_alpha_all = pd.DataFrame()
+		df_alpha_all['alphas'] = alphas
+		df_alpha_all.index = alphas
+		
+		for m in M:
+			for o in order:
+				for a in alphas:
+					filename = output_dir + release + '_' + kind +'_results_media_rank_' + o + '_' + str(a) + m + '.csv'
+					print(filename)
+					df = pd.read_csv(filename)
+					mean = df.loc[10, 'RANK_DELAUNAY']
+					df_alpha_variations_rank.loc[a, 'AVARAGE_RANK'] = mean
+				
+				if m == '_geo':
+					measure = 'GEO'
+				if m == '_iba':
+					measure = 'IBA'
+				if m == '_auc':
+					measure = 'AUC'
+				
+				df_alpha_all[o + '_' + measure] = df_alpha_variations_rank['AVARAGE_RANK'].copy()
+				
+				fig, ax = plt.subplots()
+				ax.set_title('DTO AVARAGE RANK\n ' + 'GEOMETRY = ' + o + '\nMEASURE = ' + measure, fontsize=10)
+				ax.set_xlabel('Alpha')
+				ax.set_ylabel('Rank')
+				ax.plot(df_alpha_variations_rank['AVARAGE_RANK'], marker='d', label='Avarage Rank')
+				ax.legend(loc="upper right")
+				plt.xticks(range(11))
+				fig.savefig(output_dir + release + '_' + kind +'_pic_' + o + '_' + measure + '.png', dpi=125)
+				plt.show()
+				plt.close()
+		
+		# figure(num=None, figsize=(10, 10), dpi=800, facecolor='w', edgecolor='k')
+		
+		fig, ax = plt.subplots(figsize=(10, 7))
+		ax.set_title('DTO AVARAGE RANK\n ' + '\nMEASURE = GEO', fontsize=5)
+		ax.set_xlabel('Alpha')
+		ax.set_ylabel('Rank')
+		t1 = df_alpha_all['alphas']
+		t2 = df_alpha_all['alphas']
+		t3 = df_alpha_all['alphas']
+		t4 = df_alpha_all['alphas']
+		t5 = df_alpha_all['alphas']
+		t6 = df_alpha_all['alphas']
+		t7 = df_alpha_all['alphas']
+		t8 = df_alpha_all['alphas']
+		t9 = df_alpha_all['alphas']
+		
+		ft1 = df_alpha_all['area_GEO']
+		ft2 = df_alpha_all['volume_GEO']
+		ft3 = df_alpha_all['area_volume_ratio_GEO']
+		ft4 = df_alpha_all['edge_ratio_GEO']
+		ft5 = df_alpha_all['radius_ratio_GEO']
+		ft6 = df_alpha_all['aspect_ratio_GEO']
+		ft7 = df_alpha_all['max_solid_angle_GEO']
+		ft8 = df_alpha_all['min_solid_angle_GEO']
+		ft9 = df_alpha_all['solid_angle_GEO']
+		
+		ax.plot(t1, ft1, color='tab:blue', marker='o', label='area')
+		ax.plot(t2, ft2, color='tab:red', marker='o', label='volume')
+		ax.plot(t3, ft3, color='tab:green', marker='o', label='area_volume_ratio')
+		ax.plot(t4, ft4, color='tab:orange', marker='o', label='edge_ratio')
+		ax.plot(t5, ft5, color='tab:olive', marker='o', label='radius_ratio')
+		ax.plot(t6, ft6, color='tab:purple', marker='o', label='aspect_ratio')
+		ax.plot(t7, ft7, color='tab:brown', marker='o', label='max_solid_angle')
+		ax.plot(t8, ft8, color='tab:pink', marker='o', label='min_solid_angle')
+		ax.plot(t9, ft9, color='tab:gray', marker='o', label='solid_angle')
+		
+		leg = ax.legend(loc='upper right')
+		leg.get_frame().set_alpha(0.5)
+		plt.xticks(range(12))
+		plt.savefig(output_dir + release + '_' + kind + '_pic_all_geo.png', dpi=800)
+		plt.show()
+		plt.close()
+		
+		###################
+		fig, ax = plt.subplots(figsize=(10, 7))
+		ax.set_title('DTO AVARAGE RANK\n ' + '\nMEASURE = Iba', fontsize=5)
+		ax.set_xlabel('Alpha')
+		ax.set_ylabel('Rank')
+		t1 = df_alpha_all['alphas']
+		t2 = df_alpha_all['alphas']
+		t3 = df_alpha_all['alphas']
+		t4 = df_alpha_all['alphas']
+		t5 = df_alpha_all['alphas']
+		t6 = df_alpha_all['alphas']
+		t7 = df_alpha_all['alphas']
+		t8 = df_alpha_all['alphas']
+		t9 = df_alpha_all['alphas']
+		
+		ft1 = df_alpha_all['area_IBA']
+		ft2 = df_alpha_all['volume_IBA']
+		ft3 = df_alpha_all['area_volume_ratio_IBA']
+		ft4 = df_alpha_all['edge_ratio_IBA']
+		ft5 = df_alpha_all['radius_ratio_IBA']
+		ft6 = df_alpha_all['aspect_ratio_IBA']
+		ft7 = df_alpha_all['max_solid_angle_IBA']
+		ft8 = df_alpha_all['min_solid_angle_IBA']
+		ft9 = df_alpha_all['solid_angle_IBA']
+		
+		ax.plot(t1, ft1, color='tab:blue', marker='o', label='area')
+		ax.plot(t2, ft2, color='tab:red', marker='o', label='volume')
+		ax.plot(t3, ft3, color='tab:green', marker='o', label='area_volume_ratio')
+		ax.plot(t4, ft4, color='tab:orange', marker='o', label='edge_ratio')
+		ax.plot(t5, ft5, color='tab:olive', marker='o', label='radius_ratio')
+		ax.plot(t6, ft6, color='tab:purple', marker='o', label='aspect_ratio')
+		ax.plot(t7, ft7, color='tab:brown', marker='o', label='max_solid_angle')
+		ax.plot(t8, ft8, color='tab:pink', marker='o', label='min_solid_angle')
+		ax.plot(t9, ft9, color='tab:gray', marker='o', label='solid_angle')
+		
+		leg = ax.legend(loc='upper right')
+		leg.get_frame().set_alpha(0.5)
+		plt.xticks(range(12))
+		plt.savefig(output_dir + release + '_' + kind + '_pic_all_iba.png', dpi=800)
+		plt.show()
+		plt.close()
+		
+		######################
+		
+		'''
+		fig, ax = plt.subplots()
+		ax.set_title('DTO AVARAGE RANK\n ' + '\nMEASURE = IBA' , fontsize=10)
+		ax.set_xlabel('Alpha')
+		ax.set_ylabel('Rank')
+		t1 = df_alpha_all['alphas']
+		t2 = df_alpha_all['alphas']
+		t3 = df_alpha_all['alphas']
+		
+		'area_IBA',
+		'volume_IBA',
+		'area_volume_ratio_IBA',
+		'edge_ratio_IBA',
+		'radius_ratio_IBA',
+		'aspect_ratio_IBA',
+		'max_solid_angle_IBA',
+		'min_solid_angle_IBA',
+		'solid_angle_IBA'
+		
+		
+		
+		ft1 = df_alpha_all['solid_angle_IBA']
+		ft2 = df_alpha_all['min_solid_angle_IBA']
+		ft3 = df_alpha_all['max_solid_angle_IBA']
+		ax.plot(t1, ft1, color='tab:blue', marker='o', label='solid_angle')
+		ax.plot(t2, ft2, color='tab:red', marker='o', label='min_solid_angle')
+		ax.plot(t3, ft3, color='tab:green', marker='o', label='max_solid_angle')
+		leg = ax.legend(loc='upper right')
+		leg.get_frame().set_alpha(0.5)
+		plt.xticks(range(11))
+		plt.savefig('./../variacao_alpha/graphics/multiclass_all_iba.png', dpi=800)
+		plt.show()
+		plt.close()'''
+	
+	def run_rank(self, filename, kind,release):
 		df_best_dto = pd.read_csv(filename)
 		df_B1 = df_best_dto[df_best_dto['PREPROC'] == '_Borderline1'].copy()
 		df_B2 = df_best_dto[df_best_dto['PREPROC'] == '_Borderline2'].copy()
@@ -462,5 +626,5 @@ class Performance:
 				GEOMETRY = '_delaunay_' + o + '_' + str(a)
 				df_dto = df_best_dto[df_best_dto['PREPROC'] == GEOMETRY].copy()
 				df = pd.concat([df_B1, df_B2, df_GEO, df_SMOTE, df_SMOTEsvm, df_original, df_dto])
-				self.rank_by_algorithm(df, kind, o, str(a))
-				self.rank_dto_by(o + '_' + str(a), kind)
+				self.rank_by_algorithm(df, kind, o, str(a),release)
+				self.rank_dto_by(o + '_' + str(a), kind,release)
