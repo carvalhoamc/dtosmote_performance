@@ -6,10 +6,12 @@ import pandas as pd
 
 def main():
     analisys = Performance()
-    for r in releases:
+    '''for r in releases:
         analisys.average_results(input_dir+'dto_multiclass_results_'+r+'.csv',kind='multiclass',release=r)
-        #analisys.run_rank('./../input/average_results_multiclass_'+r+'.csv',kind='multiclass',release=r)
-        #analisys.grafico_variacao_alpha(kind='multiclass',release=r)
+        analisys.run_rank(input_dir+'average_results_multiclass_'+r+'.csv',kind='multiclass',release=r)
+        analisys.grafico_variacao_alpha(kind='multiclass',release=r)
+    '''
+    analisys.best_alpha(kind='multiclass')
 
     
 if __name__ == '__main__':
