@@ -540,7 +540,7 @@ class Performance:
 		plt.savefig(output_dir + release + '_' + kind + '_pic_all_geo.png', dpi=800)
 		plt.show()
 		plt.close()
-		df_alpha_all.to_csv(output_dir + release + '_' + kind + '_pic_all_geo.csv',index=False)
+		df_alpha_all.to_csv(output_dir + release + '_' + kind + '_pic_all_geo.csv', index=False)
 		
 		###################
 		fig, ax = plt.subplots(figsize=(10, 7))
@@ -583,7 +583,50 @@ class Performance:
 		plt.savefig(output_dir + release + '_' + kind + '_pic_all_iba.png', dpi=800)
 		plt.show()
 		plt.close()
-		df_alpha_all.to_csv(output_dir + release + '_' + kind + '_pic_all_iba.csv',index=False)
+		df_alpha_all.to_csv(output_dir + release + '_' + kind + '_pic_all_iba.csv', index=False)
+		
+		if kind == 'biclass':
+			fig, ax = plt.subplots(figsize=(10, 7))
+			ax.set_title('DTO AVARAGE RANK\n ' + '\nMEASURE = AUC', fontsize=5)
+			ax.set_xlabel('Alpha')
+			ax.set_ylabel('Rank')
+			t1 = df_alpha_all['alphas']
+			t2 = df_alpha_all['alphas']
+			t3 = df_alpha_all['alphas']
+			t4 = df_alpha_all['alphas']
+			t5 = df_alpha_all['alphas']
+			t6 = df_alpha_all['alphas']
+			t7 = df_alpha_all['alphas']
+			t8 = df_alpha_all['alphas']
+			t9 = df_alpha_all['alphas']
+			
+			ft1 = df_alpha_all['area_AUC']
+			ft2 = df_alpha_all['volume_AUC']
+			ft3 = df_alpha_all['area_volume_ratio_AUC']
+			ft4 = df_alpha_all['edge_ratio_AUC']
+			ft5 = df_alpha_all['radius_ratio_AUC']
+			ft6 = df_alpha_all['aspect_ratio_AUC']
+			ft7 = df_alpha_all['max_solid_angle_AUC']
+			ft8 = df_alpha_all['min_solid_angle_AUC']
+			ft9 = df_alpha_all['solid_angle_AUC']
+			
+			ax.plot(t1, ft1, color='tab:blue', marker='o', label='area')
+			ax.plot(t2, ft2, color='tab:red', marker='o', label='volume')
+			ax.plot(t3, ft3, color='tab:green', marker='o', label='area_volume_ratio')
+			ax.plot(t4, ft4, color='tab:orange', marker='o', label='edge_ratio')
+			ax.plot(t5, ft5, color='tab:olive', marker='o', label='radius_ratio')
+			ax.plot(t6, ft6, color='tab:purple', marker='o', label='aspect_ratio')
+			ax.plot(t7, ft7, color='tab:brown', marker='o', label='max_solid_angle')
+			ax.plot(t8, ft8, color='tab:pink', marker='o', label='min_solid_angle')
+			ax.plot(t9, ft9, color='tab:gray', marker='o', label='solid_angle')
+			
+			leg = ax.legend(loc='upper right')
+			leg.get_frame().set_alpha(0.5)
+			plt.xticks(range(12))
+			plt.savefig(output_dir + release + '_' + kind + '_pic_all_auc.png', dpi=800)
+			plt.show()
+			plt.close()
+			df_alpha_all.to_csv(output_dir + release + '_' + kind + '_pic_all_auc.csv', index=False)
 	
 	def best_alpha(self, kind):
 		# Best alpha calculation
@@ -591,12 +634,24 @@ class Performance:
 		df1 = pd.read_csv(output_dir + 'v1' + '_' + kind + '_pic_all_geo.csv')
 		df2 = pd.read_csv(output_dir + 'v2' + '_' + kind + '_pic_all_geo.csv')
 		df3 = pd.read_csv(output_dir + 'v3' + '_' + kind + '_pic_all_geo.csv')
-		col = ['area_GEO', 'volume_GEO',
-		       'area_volume_ratio_GEO', 'edge_ratio_GEO', 'radius_ratio_GEO',
-		       'aspect_ratio_GEO', 'max_solid_angle_GEO', 'min_solid_angle_GEO',
-		       'solid_angle_GEO', 'area_IBA', 'volume_IBA', 'area_volume_ratio_IBA',
-		       'edge_ratio_IBA', 'radius_ratio_IBA', 'aspect_ratio_IBA',
-		       'max_solid_angle_IBA', 'min_solid_angle_IBA', 'solid_angle_IBA']
+		
+		if kind == 'biclass':
+			col = ['area_GEO', 'volume_GEO', 'area_volume_ratio_GEO',
+			       'edge_ratio_GEO', 'radius_ratio_GEO', 'aspect_ratio_GEO',
+			       'max_solid_angle_GEO', 'min_solid_angle_GEO', 'solid_angle_GEO',
+			       'area_IBA', 'volume_IBA', 'area_volume_ratio_IBA', 'edge_ratio_IBA',
+			       'radius_ratio_IBA', 'aspect_ratio_IBA', 'max_solid_angle_IBA',
+			       'min_solid_angle_IBA', 'solid_angle_IBA', 'area_AUC', 'volume_AUC',
+			       'area_volume_ratio_AUC', 'edge_ratio_AUC', 'radius_ratio_AUC',
+			       'aspect_ratio_AUC', 'max_solid_angle_AUC', 'min_solid_angle_AUC',
+			       'solid_angle_AUC']
+		else:
+			col = ['area_GEO', 'volume_GEO',
+			       'area_volume_ratio_GEO', 'edge_ratio_GEO', 'radius_ratio_GEO',
+			       'aspect_ratio_GEO', 'max_solid_angle_GEO', 'min_solid_angle_GEO',
+			       'solid_angle_GEO', 'area_IBA', 'volume_IBA', 'area_volume_ratio_IBA',
+			       'edge_ratio_IBA', 'radius_ratio_IBA', 'aspect_ratio_IBA',
+			       'max_solid_angle_IBA', 'min_solid_angle_IBA', 'solid_angle_IBA']
 		df_mean = pd.DataFrame()
 		df_mean['alphas'] = df1.alphas
 		for c in col:
@@ -643,7 +698,7 @@ class Performance:
 		plt.savefig(output_dir + kind + '_pic_average_geo.png', dpi=800)
 		plt.show()
 		plt.close()
-		df_mean.to_csv(output_dir + kind + '_pic_average_geo.csv',index=False)
+		df_mean.to_csv(output_dir + kind + '_pic_average_geo.csv', index=False)
 		
 		###################
 		fig, ax = plt.subplots(figsize=(10, 7))
@@ -686,7 +741,50 @@ class Performance:
 		plt.savefig(output_dir + kind + '_pic_average_iba.png', dpi=800)
 		plt.show()
 		plt.close()
-		df_mean.to_csv(output_dir + kind + '_pic_average_iba.csv',index=False)
+		df_mean.to_csv(output_dir + kind + '_pic_average_iba.csv', index=False)
+		
+		###################
+		fig, ax = plt.subplots(figsize=(10, 7))
+		ax.set_title('DTO AVARAGE RANK\n ' + '\nMEASURE = AUC', fontsize=5)
+		ax.set_xlabel('Alpha')
+		ax.set_ylabel('Rank')
+		t1 = df_mean['alphas']
+		t2 = df_mean['alphas']
+		t3 = df_mean['alphas']
+		t4 = df_mean['alphas']
+		t5 = df_mean['alphas']
+		t6 = df_mean['alphas']
+		t7 = df_mean['alphas']
+		t8 = df_mean['alphas']
+		t9 = df_mean['alphas']
+		
+		ft1 = df_mean['area_AUC']
+		ft2 = df_mean['volume_AUC']
+		ft3 = df_mean['area_volume_ratio_AUC']
+		ft4 = df_mean['edge_ratio_AUC']
+		ft5 = df_mean['radius_ratio_AUC']
+		ft6 = df_mean['aspect_ratio_AUC']
+		ft7 = df_mean['max_solid_angle_AUC']
+		ft8 = df_mean['min_solid_angle_AUC']
+		ft9 = df_mean['solid_angle_AUC']
+		
+		ax.plot(t1, ft1, color='tab:blue', marker='o', label='area')
+		ax.plot(t2, ft2, color='tab:red', marker='o', label='volume')
+		ax.plot(t3, ft3, color='tab:green', marker='o', label='area_volume_ratio')
+		ax.plot(t4, ft4, color='tab:orange', marker='o', label='edge_ratio')
+		ax.plot(t5, ft5, color='tab:olive', marker='o', label='radius_ratio')
+		ax.plot(t6, ft6, color='tab:purple', marker='o', label='aspect_ratio')
+		ax.plot(t7, ft7, color='tab:brown', marker='o', label='max_solid_angle')
+		ax.plot(t8, ft8, color='tab:pink', marker='o', label='min_solid_angle')
+		ax.plot(t9, ft9, color='tab:gray', marker='o', label='solid_angle')
+		
+		leg = ax.legend(loc='upper right')
+		leg.get_frame().set_alpha(0.5)
+		plt.xticks(range(12))
+		plt.savefig(output_dir + kind + '_pic_average_auc.png', dpi=800)
+		plt.show()
+		plt.close()
+		df_mean.to_csv(output_dir + kind + '_pic_average_auc.csv', index=False)
 	
 	def run_rank(self, filename, kind, release):
 		df_best_dto = pd.read_csv(filename)
