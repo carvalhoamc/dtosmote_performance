@@ -7,12 +7,12 @@ from classifiers import classifiers_list
 from datasets import dataset_biclass, dataset_multiclass
 
 # geometry
-order = ['area',  # ok
-         'volume',  # ok
-         'area_volume_ratio',  # ok
-         'edge_ratio',  # ok
-         'radius_ratio',  # ok
-         'aspect_ratio',  # ok
+order = ['area',
+         'volume',
+         'area_volume_ratio',
+         'edge_ratio',
+         'radius_ratio',
+         'aspect_ratio',
          'max_solid_angle',
          'min_solid_angle',
          'solid_angle']
