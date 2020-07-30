@@ -988,21 +988,19 @@ class Performance:
 		df_mean['RANK_GEOMETRIC_SMOTE'] = pd.to_numeric(df_mean['RANK_GEOMETRIC_SMOTE'], downcast="float").round(2)
 		df_mean['RANK_DELAUNAY'] = pd.to_numeric(df_mean['RANK_DELAUNAY'], downcast="float").round(2)
 		
-		df_mean.to_csv(output_dir + 'overall_rank_results_' + kind + '_' + str(alpha) + '_' + ext + '.csv',index=False)
-
-
-	def cd_graphics(self,df,datasetlen,kind):#TODO
+		df_mean.to_csv(output_dir + 'overall_rank_results_' + kind + '_' + str(alpha) + '_' + ext + '.csv', index=False)
+	
+	def cd_graphics(self, df, datasetlen, kind):  # TODO
 		# grafico CD
-		names = ['ORIGINAL', 'SMOTE', 'SMOTE_SVM', 'BORDERLINE1', 'BORDERLINE2', 'GEOMETRIC_SMOTE','DTO']
+		names = ['ORIGINAL', 'SMOTE', 'SMOTE_SVM', 'BORDERLINE1', 'BORDERLINE2', 'GEOMETRIC_SMOTE', 'DTO']
 		algorithms = classifiers_list
 		
-		for i in np.arange(0,len(algorithms)):
+		for i in np.arange(0, len(algorithms)):
 			avranks = list(df.loc[i])
 			algorithm = avranks[0]
 			measure = avranks[1]
 			avranks = avranks[2:]
 			cd = Orange.evaluation.compute_CD(avranks, datasetlen)
 			Orange.evaluation.graph_ranks(avranks, names, cd=cd, width=len(algorithms), textspace=3)
-			plt.savefig(output_dir + kind+'_cd_'+algorithm+'_'+measure+'.pdf')
+			plt.savefig(output_dir + kind + '_cd_' + algorithm + '_' + measure + '.pdf')
 			plt.close()
-		

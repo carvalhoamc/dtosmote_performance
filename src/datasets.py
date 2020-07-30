@@ -1,4 +1,4 @@
-#See biclass_alias.png
+# See biclass_alias.png
 dataset_biclass = [
 	'x81data',
 	'x80data',
@@ -72,4 +72,3 @@ dataset_multiclass = [
 	'thyroid',
 	'wine'
 ]
-
